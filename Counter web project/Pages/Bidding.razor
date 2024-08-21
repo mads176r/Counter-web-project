@@ -1,0 +1,67 @@
+﻿@page "/bidding"
+
+<PageTitle>Bidding</PageTitle>
+
+@using Counter_web_project.Data.Bidding
+
+<h1>Bid</h1>
+
+<div>
+    <label for="name">Name:</label>
+    <input type="text" id="name" @bind="bidName" />
+
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" @bind="bidAmount" />
+
+    <button class="btn btn-primary" @onclick="PlaceBid">Place Bid</button>
+</div>
+<br />
+
+@if (bids != null && bids.Any())
+{
+    <ol>
+        @foreach (Bid bid in bids)
+        {
+            <li>@bid.ToString()</li> <!-- Ensure ToString() is overridden in Bid class -->
+        }
+    </ol>
+}
+else
+{
+    <p>No bids available.</p>
+}
+
+@code {
+    private string bidName;
+    private double bidAmount;
+    private List<Bid> bids;
+
+    protected override void OnInitialized()
+    {
+        bids = LoadBids();
+    }
+
+    private void PlaceBid()
+    {
+        if (string.IsNullOrWhiteSpace(bidName) || bidAmount <= 0)
+        {
+            // Handle validation
+            return;
+        }
+
+        Bid newBid = new Bid(bidName, bidAmount);
+        newBid.CreateBid(newBid);
+
+        // Update the list of bids
+        bids = LoadBids();
+
+        // Optionally reset the form
+        bidName = string.Empty;
+        bidAmount = 0;
+    }
+
+    private List<Bid> LoadBids()
+    {
+        return new Bid().GetBids();
+    }
+}
